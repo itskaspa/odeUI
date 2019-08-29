@@ -50,7 +50,7 @@ function lagbar()
 		
 	local b=CreateFrame("Frame")
 	b:SetPoint("BOTTOMLEFT", CharacterBag3Slot)
-	b:SetPoint("TOPRIGHT", bag)	--fixme
+	b:SetPoint("TOPRIGHT", bag)
 	b:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
@@ -64,7 +64,6 @@ end
 
 --[[ bag bar ]]
 function bags() 
-SetCVar("displayFreeBagSlots", 1)
 local f=CreateFrame("Frame")
 	local bag = MainMenuBarBackpackButton
 	bag:ClearAllPoints()
@@ -351,7 +350,6 @@ function darken()
 			PlayerFrameTexture, PetFrameTexture, TargetFrameTextureFrameTexture, TargetFrameToTTextureFrameTexture,
 			PartyMemberFrame1Texture, PartyMemberFrame2Texture, PartyMemberFrame3Texture, PartyMemberFrame4Texture,
 			PartyMemberFrame1PetFrameTexture, PartyMemberFrame2PetFrameTexture, PartyMemberFrame3PetFrameTexture, PartyMemberFrame4PetFrameTexture, 
-			--CastingBarFrame.Border,  TargetFrameSpellBar.Border, 
 			MainMenuBarTexture0, MainMenuBarTexture1, MainMenuBarTexture2, MainMenuBarTexture3,
 			MinimapBorder, MiniMapTrackingButtonBorder, MiniMapLFGFrameBorder, MiniMapBattlefieldBorder, MiniMapMailBorder, MinimapBorderTop, 
 			select(1, TimeManagerClockButton:GetRegions()),
