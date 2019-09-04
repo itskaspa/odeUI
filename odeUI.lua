@@ -85,7 +85,7 @@ end
 
 --[[ misc slash cmd, options, etc]]
 function misc()
-	print("Odi's UI Scripts Loaded.")
+	print("Ode's UI Scripts Loaded.")
 	SlashCmdList["RELOADUI"] = function() ReloadUI() end
 	SLASH_RELOADUI1 = "/rl"
 	SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
