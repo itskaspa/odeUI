@@ -431,7 +431,7 @@ end
 local frame=CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addon)
-	if (addon == "oUI_Classic_RetailTest") then
+	if (addon == "odeUI") then
 		RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0, 0.44, 0.87, 1);
 		if db == nil then db = {
 			hideraidnames = false,
