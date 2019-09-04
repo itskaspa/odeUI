@@ -85,13 +85,14 @@ end
 
 --[[ misc slash cmd, options, etc]]
 function misc()
-print("Odi's UI Scripts Loaded.")
-SlashCmdList["RELOADUI"] = function() ReloadUI() end
+	print("Odi's UI Scripts Loaded.")
+	SlashCmdList["RELOADUI"] = function() ReloadUI() end
 	SLASH_RELOADUI1 = "/rl"
-SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
-    SLASH_READYCHECK1 = '/rc'
-SetCVar ("chatClassColorOverride", 0)
-SetCVar ("scriptErrors", 0)
+	SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
+	SLASH_READYCHECK1 = '/rc'
+	SetCVar ("chatClassColorOverride", 0)
+	SetCVar ("scriptErrors", 1)
+	SetCVar ("ActionButtonUseKeyDown", 1)
 end
 
 --[[ Hide Stuff ]]--
