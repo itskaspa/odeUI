@@ -50,7 +50,7 @@ function lagbar()
 		
 	local b=CreateFrame("Frame")
 	b:SetPoint("BOTTOMLEFT", CharacterBag3Slot)
-	b:SetPoint("TOPRIGHT", bag)
+	b:SetPoint("TOPRIGHT", bag)	--fixme
 	b:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
@@ -90,12 +90,13 @@ SlashCmdList["RELOADUI"] = function() ReloadUI() end
 	SLASH_RELOADUI1 = "/rl"
 SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
     SLASH_READYCHECK1 = '/rc'
+SetCVar ("chatClassColorOverride", 0)
+SetCVar ("scriptErrors", 0)
 end
 
 --[[ Hide Stuff ]]--
 function hide() 
 	for i, v in pairs ({
-		--TalentMicroButton,
 		PlayerFrameGroupIndicator,
 		MainMenuBarPerformanceBar,
 		MainMenuBarPerformanceBarFrame,
@@ -109,11 +110,12 @@ function hide()
 		ActionBarUpButton,
 		ActionBarDownButton,
 		GameTimeFrame,
+		MinimapZoomIn,
+		MinimapZoomOut,
 		})
 	do 
 		v:Hide()
-		TalentMicroButton:ClearAllPoints()
-		TalentMicroButton:SetPoint("TOPLEFT",UIPARENT)
+		hooksecurefunc("UpdateMicroButtons",function(...) if TalentMicroButton then TalentMicroButton:Hide() end end) -- hide store button
 		-- put alphas/offscreens here
 		MainMenuBarPageNumber:SetAlpha(0)
 		TargetFrameTextureFramePVPIcon:SetAlpha(0)
@@ -329,8 +331,6 @@ end
 
 --[[ Minimap Mousewheel support ]]
 function minimap()
-	MinimapZoomIn:Hide()
-	MinimapZoomOut:Hide()
 	Minimap:EnableMouseWheel(true)
 	Minimap:SetScript('OnMouseWheel', function(self, delta)
 		if delta > 0 then
@@ -350,6 +350,7 @@ function darken()
 			PlayerFrameTexture, PetFrameTexture, TargetFrameTextureFrameTexture, TargetFrameToTTextureFrameTexture,
 			PartyMemberFrame1Texture, PartyMemberFrame2Texture, PartyMemberFrame3Texture, PartyMemberFrame4Texture,
 			PartyMemberFrame1PetFrameTexture, PartyMemberFrame2PetFrameTexture, PartyMemberFrame3PetFrameTexture, PartyMemberFrame4PetFrameTexture, 
+			--CastingBarFrame.Border,  TargetFrameSpellBar.Border, 
 			MainMenuBarTexture0, MainMenuBarTexture1, MainMenuBarTexture2, MainMenuBarTexture3,
 			MinimapBorder, MiniMapTrackingButtonBorder, MiniMapLFGFrameBorder, MiniMapBattlefieldBorder, MiniMapMailBorder, MinimapBorderTop, 
 			select(1, TimeManagerClockButton:GetRegions()),
