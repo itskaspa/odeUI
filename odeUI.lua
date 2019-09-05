@@ -91,7 +91,7 @@ function misc()
 	SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
 	SLASH_READYCHECK1 = '/rc'
 	SetCVar ("chatClassColorOverride", 0)
-	SetCVar ("scriptErrors", 1)
+	SetCVar ("scriptErrors", 0)
 	SetCVar ("ActionButtonUseKeyDown", 1)
 end
 
