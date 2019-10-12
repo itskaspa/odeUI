@@ -89,7 +89,7 @@ function misc()
 	SlashCmdList["RELOADUI"] = function() ReloadUI() end
 	SLASH_RELOADUI1 = "/rl"
 	SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
-	SLASH_READYCHECK1 = '/rc'
+    SLASH_READYCHECK1 = '/rc'
 	SetCVar ("chatClassColorOverride", 0)
 	SetCVar ("scriptErrors", 0)
 	SetCVar ("ActionButtonUseKeyDown", 1)
@@ -145,10 +145,14 @@ function move()
 	MainMenuXPBarTexture1:SetHeight(MainMenuExpBar:GetHeight())
 	MainMenuXPBarTexture2:SetPoint("BOTTOMLEFT", MainMenuXPBarTexture1, "BOTTOMRIGHT")
 	MainMenuXPBarTexture2:SetHeight(MainMenuExpBar:GetHeight())
-	MainMenuXPBarTexture3:Hide()
+	MainMenuXPBarTexture3:Hide()	
 	ReputationWatchBar:ClearAllPoints()
-	ReputationWatchBar:SetPoint("TOP", UIPARENT, "TOP")
-	ReputationWatchBar.SetPoint = function() end
+	ReputationWatchBar:SetPoint("BOTTOM", UIPARENT, "BOTTOM", 0, 2)
+	ReputationWatchBar.StatusBar:SetWidth(ReputationWatchBar.StatusBar.XPBarTexture1:GetWidth()*2)
+	ReputationWatchBar.StatusBar.XPBarTexture0:SetHeight(ReputationWatchBar.StatusBar:GetHeight())
+	ReputationWatchBar.StatusBar.XPBarTexture1:SetHeight(ReputationWatchBar.StatusBar:GetHeight())
+	ReputationWatchBar.StatusBar.XPBarTexture2:Hide()
+	ReputationWatchBar.StatusBar.XPBarTexture3:Hide()
 	MainMenuBarRightEndCap:ClearAllPoints()
 	MainMenuBarRightEndCap:SetPoint("BOTTOMLEFT", MainMenuExpBar, "BOTTOMRIGHT", -30, 0)
 	MainMenuBarRightEndCap:SetScale(1)
@@ -366,7 +370,7 @@ function darken()
 			select(2, TimeManagerClockButton:GetRegions()):SetTextColor(1,1,1,1)
 		end
 		for i, v in pairs({
-			MainMenuXPBarTexture1,MainMenuXPBarTexture2,
+			MainMenuXPBarTexture1,MainMenuXPBarTexture2, ReputationWatchBar.StatusBar.XPBarTexture0, ReputationWatchBar.StatusBar.XPBarTexture1,
 			MainMenuBarLeftEndCap, MainMenuBarRightEndCap, StanceBarLeft, StanceBarMiddle, StanceBarRight, -- classic
 		}) do
 			v:SetVertexColor(.4, .4, .4)
@@ -397,7 +401,6 @@ function darken()
 	f:SetScript("OnEvent", nil)
 	end)
 end	
-
 
 --[[ Autosell Trash ]]
 function vendor()
