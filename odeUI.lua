@@ -243,7 +243,7 @@ function chat()
 	ChatFrameMenuButton:Hide()
 	ChatFrameChannelButton:Hide()
 
-	for i = 1, 9 do
+	for i = 1, NUM_CHAT_WINDOWS do
 		_G["ChatFrame"..i.."ButtonFrame"]:Hide()
 		_G["ChatFrame"..i]:SetClampRectInsets(-5, 0, 0, -8)
 	end 
