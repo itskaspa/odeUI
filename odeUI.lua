@@ -25,7 +25,7 @@ hooksecurefunc("ActionButton_OnUpdate",function(self, elapsed)
 end)
 end
 
---[[ lagbar vars ]]
+--[[ memory usage variables ]]
 local TablePool = {}
 local Sorted = {}
 local TotalMemoryUsage = 0
@@ -33,7 +33,7 @@ local Sort = function(a, b)
 	return a[2] > b[2]
 end
 
-	--[[ tooltip things ]]	
+--[[ memory usage tooltip function]]	
 local OnEnter = function(self, motion)
 	GameTooltip:SetOwner(box, "ANCHOR_CURSOR")
     GameTooltip:ClearLines()	
@@ -58,7 +58,7 @@ local OnEnter = function(self, motion)
 	
 	local Max = #Sorted
 
-	--[[Show up to 20 entries]]
+	-- Show up to 20 entries
 	for i = 1, (Max > 30 and 30 or Max) do
 		if Sorted[i][2] > 1024	then 
 			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.1f", (Sorted[i][2]/1024)) .. " Mb", 1, 1, 1) 
@@ -71,9 +71,9 @@ local OnEnter = function(self, motion)
 	for i = 1, Max do
 		tinsert(TablePool, tremove(Sorted, 1))
 	end	
-	
+
+	-- Display the Tooltip, then clear it afterwards
 	GameTooltip:Show()
-	
 	TotalMemoryUsage = 0
 	
 end
@@ -159,7 +159,7 @@ function misc()
 	SlashCmdList["READYCHECK"] = function() DoReadyCheck() end
     SLASH_READYCHECK1 = '/rc'
 	SetCVar ("chatClassColorOverride", 0)
-	SetCVar ("scriptErrors", 0)
+	SetCVar ("scriptErrors", 1)
 	SetCVar ("ActionButtonUseKeyDown", 1)
 	--SetCVar ("cameraDistanceMaxZoomFactor", 4) --not sure why this doesnt work here...
 	PlayerFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Rare-Elite")
@@ -235,6 +235,26 @@ function move()
 	MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", MultiBarBottomLeft, "LEFT")
 	MainMenuBarVehicleLeaveButton.SetPoint = function() end
 end
+
+
+
+function chat()	
+
+	ChatFrameMenuButton:Hide()
+	ChatFrameChannelButton:Hide()
+
+	for i = 1, 9 do
+		_G["ChatFrame"..i.."ButtonFrame"]:Hide()
+		_G["ChatFrame"..i]:SetClampRectInsets(-5, 0, 0, -8)
+	end 
+
+	ChatFrame1:ClearAllPoints()
+	ChatFrame1:SetPoint("BOTTOMLEFT")	
+	ChatFrame1EditBox:ClearAllPoints()
+	ChatFrame1EditBox:SetPoint("BOTTOMLEFT", ChatFrame1, "TOPLEFT", 0, 0)
+	ChatFrame1EditBox:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 0)
+end
+
 
 --[[ Hide Bar Text ]]--
 function hidebartext()
@@ -315,32 +335,6 @@ function uf()
 		i = _G["PartyMemberFrame"..i.."PVPIcon"]
 		i:SetAlpha(0)
 	end
-end
-
---[[ Flat Raid Statusbar Textures ]]
-function styleraid()
-hooksecurefunc("CompactUnitFrame_UpdateName", function(self)
-	for g=1, NUM_RAID_GROUPS do
-		for m = 1,6 do
-			local frame = _G["CompactRaidGroup"..g.."Member"..m.."HealthBar"]
-			if frame then
-				select(2,frame:GetRegions()):SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
-				local n = _G["CompactRaidGroup"..g.."Member"..m].name
-				if hideraidnames then n:Hide() else
-					n:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
-				end
-			end	
-			local frame = _G["CompactRaidFrame"..m.."HealthBar"]
-			if frame then
-				select(2,frame:GetRegions()):SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
-				local n = _G["CompactRaidFrame"..m].name
-				if hideraidnames then n:Hide() else
-					n:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
-				end
-			end
-		end		
-	end
-end)
 end
 
 --[[ Flat other statusbar textures ]]	
@@ -508,7 +502,7 @@ function vendor()
 	end)
 end
 
---[[ Int ]]--
+--[[ Initialize ]]--
 local frame=CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addon)
@@ -533,6 +527,7 @@ frame:SetScript("OnEvent", function(self, event, addon)
 			redrange = true,
 			darken = true,
 			vendor = false,
+			chat = true,
 			}
 		end 
 	end		
@@ -556,6 +551,7 @@ frame:SetScript("OnEvent", function(self, event, addon)
 			if db.bags then bags() end
 			if db.redrange then redrange() end
 			if db.vendor then vendor() end
+			if db.chat then chat() end
 		end
 		self:UnregisterEvent("ADDON_LOADED")
 		frame:SetScript("OnEvent", nil)
