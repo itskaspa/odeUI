@@ -25,41 +25,109 @@ hooksecurefunc("ActionButton_OnUpdate",function(self, elapsed)
 end)
 end
 
---[[ show fps/latency ]]
+--[[ lagbar vars ]]
+local TablePool = {}
+local Sorted = {}
+local TotalMemoryUsage = 0
+local Sort = function(a, b)
+	return a[2] > b[2]
+end
+
+	--[[ tooltip things ]]	
+local OnEnter = function(self, motion)
+	GameTooltip:SetOwner(box, "ANCHOR_CURSOR")
+    GameTooltip:ClearLines()	
+	
+	local Memory=collectgarbage("count")
+	local Name, Table
+
+	UpdateAddOnMemoryUsage()
+
+	for i = 1, GetNumAddOns() do 
+		Name = select(2, GetAddOnInfo(i)) 
+		Memory = GetAddOnMemoryUsage(i)
+		Table = TablePool[1] and tremove(TablePool, 1) or {}
+		Table[1] = Name
+		Table[2] = Memory			
+		tinsert(Sorted, Table)
+		TotalMemoryUsage = TotalMemoryUsage + Memory
+	end	
+	
+	-- Sort information
+	table.sort(Sorted, Sort)
+	
+	local Max = #Sorted
+
+	--[[Show up to 20 entries]]
+	for i = 1, (Max > 30 and 30 or Max) do
+		if Sorted[i][2] > 1024	then 
+			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.1f", (Sorted[i][2]/1024)) .. " Mb", 1, 1, 1) 
+		else 
+			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.0f", (Sorted[i][2])) .. " Kb",1 ,1 ,1)		
+		end
+	end
+
+	-- Clear the sorting table for next use
+	for i = 1, Max do
+		tinsert(TablePool, tremove(Sorted, 1))
+	end	
+	
+	GameTooltip:Show()
+	
+	TotalMemoryUsage = 0
+	
+end
+	
+local OnLeave = function(self, motion)
+	GameTooltip:Hide()
+end
+
+--[[ show memory/latency ]]
 function lagbar()
-	local MAX_INTERVAL = 5
+	local MAX_INTERVAL = 10
 	local UPDATE_INTERVAL = 0
 	local bag = MainMenuBarBackpackButton
-	local f=CreateFrame("Frame")
+
+	f=CreateFrame("Frame")
+
 		f:SetPoint("BOTTOMLEFT", CharacterBag3Slot, "TOPLEFT")
 		f:SetPoint("TOPRIGHT", bag, "TOPLEFT")
 		f.text = f:CreateFontString(nil,"ARTWORK")
 		f.text:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE")
 		f.text:SetPoint("CENTER")
 		f:Show()
+		
 		f:SetScript("OnUpdate", function(self,arg1)
 			if (UPDATE_INTERVAL > 0) then
 				UPDATE_INTERVAL = UPDATE_INTERVAL - arg1
 			else
 				UPDATE_INTERVAL = MAX_INTERVAL;
-			local fps=floor(GetFramerate())
+			--local fps=floor(GetFramerate())
 			local home=select(3,GetNetStats())
-			f.text:SetText(fps.." fps".." | "..home.." ms")
-		end
-	end)
-		
-	local b=CreateFrame("Frame")
-	b:SetPoint("BOTTOMLEFT", CharacterBag3Slot)
-	b:SetPoint("TOPRIGHT", bag)	--fixme
-	b:SetBackdrop({
+			
+			TotalMemoryUsage = 0
+			UpdateAddOnMemoryUsage() 
+			for i = 1, GetNumAddOns() do
+				TotalMemoryUsage = TotalMemoryUsage + GetAddOnMemoryUsage(i)
+			end			
+			f.text:SetText(string.format("%.1f",TotalMemoryUsage/1024).." mb".." | "..home.." ms")
+			end
+		end)
+
+	box=CreateFrame("Frame")
+	box:SetPoint("BOTTOMLEFT", CharacterBag3Slot)
+	box:SetPoint("TOPRIGHT", bag)	--fixme
+	box:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
 		tile = true, tileSize = 16, edgeSize = 8, 
 		insets = { left = 2, right = 2, top = 2, bottom = 2 }
 		})
-	b:SetBackdropColor(0,0,0,1)
-	b:SetBackdropBorderColor(.4,.4,.4,1)
-	b:Show()
+	box:SetBackdropColor(0,0,0,1)
+	box:SetBackdropBorderColor(.4,.4,.4,1)
+	box:Show()
+	box:SetScript("OnEnter", OnEnter)
+	box:SetScript("OnLeave", OnLeave)
 end
 
 --[[ bag bar ]]
@@ -93,6 +161,8 @@ function misc()
 	SetCVar ("chatClassColorOverride", 0)
 	SetCVar ("scriptErrors", 0)
 	SetCVar ("ActionButtonUseKeyDown", 1)
+	--SetCVar ("cameraDistanceMaxZoomFactor", 4) --not sure why this doesnt work here...
+	PlayerFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Rare-Elite")
 end
 
 --[[ Hide Stuff ]]--
@@ -161,6 +231,9 @@ function move()
 	MainMenuBarLeftEndCap:SetPoint("BOTTOMRIGHT", MainMenuExpBar, "BOTTOMLEFT", 30, 0)
 	MainMenuBarLeftEndCap:SetScale(1)
 	StanceBarFrame:SetPoint("RIGHT",PlayerFrame,"LEFT",0,0)
+	MainMenuBarVehicleLeaveButton:ClearAllPoints()
+	MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", MultiBarBottomLeft, "LEFT")
+	MainMenuBarVehicleLeaveButton.SetPoint = function() end
 end
 
 --[[ Hide Bar Text ]]--
@@ -398,6 +471,9 @@ function darken()
 			_G["MultiBarBottomLeftButton"..i]:SetBackdropBorderColor(0,0,0,1)
 			_G["MultiBarBottomLeftButton"..i.."FloatingBG"]:SetVertexColor(.2, .2, .2, 1)
 		end	
+		
+			SetCVar ("cameraDistanceMaxZoomFactor", 4)
+			
 	f:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	f:SetScript("OnEvent", nil)
 	end)
@@ -462,6 +538,7 @@ frame:SetScript("OnEvent", function(self, event, addon)
 	end		
 	if (addon == "Blizzard_TimeManager") then
 		do		
+			misc()
 			if db.darken then darken() end
 			if db.stylemisc then stylemisc() end
 			if db.styleraid then styleraid() end
@@ -479,7 +556,6 @@ frame:SetScript("OnEvent", function(self, event, addon)
 			if db.bags then bags() end
 			if db.redrange then redrange() end
 			if db.vendor then vendor() end
-			misc()
 		end
 		self:UnregisterEvent("ADDON_LOADED")
 		frame:SetScript("OnEvent", nil)
