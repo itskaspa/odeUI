@@ -1,3 +1,10 @@
+--[[ target info ]]
+function targethealth()
+	TargetFrameTextureFrame:CreateFontString("TargetFrameHealthBarText", "BORDER", "TextStatusBarText")
+	TargetFrameHealthBarText:SetPoint("CENTER", TargetFrameHealthBar, "CENTER", 0, 0)
+	UnitFrameHealthBar_Initialize("target", TargetFrameHealthBar, TargetFrameHealthBarText, true)
+end
+
 --[[ red range ]]
 function redrange()
 hooksecurefunc("ActionButton_OnEvent",function(self, event, ...)
@@ -237,8 +244,6 @@ function move()
 	MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", MultiBarBottomLeft, "LEFT")
 	MainMenuBarVehicleLeaveButton.SetPoint = function() end
 end
-
-
 
 function chat()	
 
