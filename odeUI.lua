@@ -25,7 +25,7 @@ hooksecurefunc("ActionButton_OnUpdate",function(self, elapsed)
 end)
 end
 
---[[ memory usage variables ]]
+--[[ lagbar vars ]]
 local TablePool = {}
 local Sorted = {}
 local TotalMemoryUsage = 0
@@ -33,7 +33,7 @@ local Sort = function(a, b)
 	return a[2] > b[2]
 end
 
---[[ memory usage tooltip function]]	
+--[[ memory usage tooltip func]]	
 local OnEnter = function(self, motion)
 	GameTooltip:SetOwner(box, "ANCHOR_CURSOR")
     GameTooltip:ClearLines()	
@@ -46,11 +46,13 @@ local OnEnter = function(self, motion)
 	for i = 1, GetNumAddOns() do 
 		Name = select(2, GetAddOnInfo(i)) 
 		Memory = GetAddOnMemoryUsage(i)
-		Table = TablePool[1] and tremove(TablePool, 1) or {}
-		Table[1] = Name
-		Table[2] = Memory			
-		tinsert(Sorted, Table)
-		TotalMemoryUsage = TotalMemoryUsage + Memory
+		if Memory > 0 then
+			Table = TablePool[1] and tremove(TablePool, 1) or {}
+			Table[1] = Name
+			Table[2] = Memory			
+			tinsert(Sorted, Table)
+			TotalMemoryUsage = TotalMemoryUsage + Memory
+		end
 	end	
 	
 	-- Sort information
@@ -58,12 +60,12 @@ local OnEnter = function(self, motion)
 	
 	local Max = #Sorted
 
-	-- Show up to 20 entries
+	-- Show up to 30 entries
 	for i = 1, (Max > 30 and 30 or Max) do
 		if Sorted[i][2] > 1024	then 
-			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.1f", (Sorted[i][2]/1024)) .. " Mb", 1, 1, 1) 
+			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.2f", (Sorted[i][2]/1024)) .. " Mb", 1, 1, 1) 
 		else 
-			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.0f", (Sorted[i][2])) .. " Kb",1 ,1 ,1)		
+			GameTooltip:AddDoubleLine(Sorted[i][1], format("%.1f", (Sorted[i][2])) .. " Kb",1 ,1 ,1)		
 		end
 	end
 
@@ -245,14 +247,33 @@ function chat()
 
 	for i = 1, NUM_CHAT_WINDOWS do
 		_G["ChatFrame"..i.."ButtonFrame"]:Hide()
+		_G["ChatFrame"..i.."EditBoxLeft"]:Hide()
+		_G["ChatFrame"..i.."EditBoxMid"]:Hide()
+		_G["ChatFrame"..i.."EditBoxRight"]:Hide()
 		_G["ChatFrame"..i]:SetClampRectInsets(-5, 0, 0, -8)
 	end 
 
 	ChatFrame1:ClearAllPoints()
 	ChatFrame1:SetPoint("BOTTOMLEFT")	
+--	ChatFrame1EditBox:SetTexture("Interface/Tooltips/UI-Tooltip-Border")
+
 	ChatFrame1EditBox:ClearAllPoints()
-	ChatFrame1EditBox:SetPoint("BOTTOMLEFT", ChatFrame1, "TOPLEFT", 0, 0)
-	ChatFrame1EditBox:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 0)
+	ChatFrame1EditBox:SetPoint("BOTTOMLEFT", ChatFrame1Background, "TOPLEFT", -1, 5)
+	ChatFrame1EditBox:SetPoint("BOTTOMRIGHT", ChatFrame1Background, "TOPRIGHT", 1, 5)
+	
+	
+	ChatFrame1EditBox:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Background",
+		--edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
+		--tile = true, 
+		--tileSize = 16, 
+		edgeSize = 2, 
+		--insets = { left = -2, right = -2, top = -2, bottom = -2 }
+		})
+	ChatFrame1EditBox:SetBackdropColor(0,0,0,1)
+	ChatFrame1EditBox:SetBackdropBorderColor(0,0,0,1)
+	
 end
 
 
@@ -336,6 +357,35 @@ function uf()
 		i:SetAlpha(0)
 	end
 end
+
+--[[ Flat Raid textures and big font -- WIP
+
+function styleraid()
+hooksecurefunc("CompactUnitFrame_UpdateName", function(self)
+	for g=1, NUM_RAID_GROUPS do
+		for m = 1,6 do
+			local frame = _G["CompactRaidGroup"..g.."Member"..m.."HealthBar"]
+			if frame then
+				select(2,frame:GetRegions()):SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
+				local n = _G["CompactRaidGroup"..g.."Member"..m].name
+				if hideraidnames then n:Hide() else
+					n:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+				end
+			end	
+			local frame = _G["CompactRaidFrame"..m.."HealthBar"]
+			if frame then
+				select(2,frame:GetRegions()):SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
+				local n = _G["CompactRaidFrame"..m].name
+				if hideraidnames then n:Hide() else
+					n:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+				end
+			end
+		end		
+	end
+end)
+end
+]]
+
 
 --[[ Flat other statusbar textures ]]	
 function stylemisc()			
