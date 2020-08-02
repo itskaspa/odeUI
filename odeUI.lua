@@ -557,16 +557,38 @@ function vendor()
 	end)
 end
 
+function resetode()
+	db.hideraidnames = false
+	db.stylemisc = true
+	db.styleraid = false
+	db.hide = true
+	db.move = true
+	db.bags = true
+	db.lagbar = true
+	db.hidebartext = true
+	db.mouseover = true
+	db.castbars = true
+	db.uf = true
+	db.classicons = true
+	db.classcolors = true
+	db.classplates = true
+	db.minimap = true
+	db.redrange = true
+	db.darken = true
+	db.vendor = true
+	db.chat = true
+end
+
 --[[ Initialize ]]--
 local frame=CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addon)
 	if (addon == "odeUI") then
-		RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0, 0.44, 0.87, 1);
+		--RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0, 0.44, 0.87, 1);
 		if db == nil then db = {
 			hideraidnames = false,
 			stylemisc = true,
-			styleraid = true,
+			styleraid = false,
 			hide = true,
 			move = true,
 			bags = true,
@@ -589,6 +611,7 @@ frame:SetScript("OnEvent", function(self, event, addon)
 	if (addon == "Blizzard_TimeManager") then
 		do		
 			misc()
+			RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0, 0.44, 0.87, 1)
 			if db.darken then darken() end
 			if db.stylemisc then stylemisc() end
 			if db.styleraid then styleraid() end
